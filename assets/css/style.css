@@ -1,0 +1,107 @@
+﻿        /* Base Tokens based on design_system5 */
+        :root {
+            --c-bg: #E3E1DC; 
+            --c-dark: #121212;
+            --c-accent: #374336; 
+            --font-display: 'Syncopate', sans-serif;
+            --font-body: 'Manrope', sans-serif;
+        }
+
+        body {
+            background-color: var(--c-dark);
+            color: #ffffff;
+            font-family: var(--font-body);
+            margin: 0;
+            overflow-x: hidden;
+            opacity: 0; /* JS will fade this in smoothly */
+        }
+        
+        .display { font-family: var(--font-display); }
+
+        /* Noise Overlay for premium texture */
+        .noise-overlay {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9000;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
+        }
+
+        /* Button Shimmer Animation */
+        @keyframes shimmer {
+            from { transform: translateX(-100%) skewX(-15deg); }
+            to { transform: translateX(200%) skewX(-15deg); }
+        }
+
+
+
+        /* Flashlight Effect */
+        .flashlight-card {
+            position: relative;
+        }
+        .flashlight-card::before {
+            content: "";
+            position: absolute;
+            inset: 0px;
+            background: radial-gradient(
+                1000px circle at var(--mouse-x, -9999px) var(--mouse-y, -9999px),
+                rgba(255, 255, 255, 0.05),
+                transparent 40%
+            );
+            opacity: 0;
+            transition: opacity 0.5s;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .flashlight-card:hover::before { opacity: 1; }
+
+        /* Typography Sub-Tweaks */
+        .text-outline {
+            -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.4);
+            color: transparent;
+            transition: color 0.5s ease, -webkit-text-stroke-color 0.5s ease;
+        }
+        .text-outline:hover {
+            color: rgba(255, 255, 255, 0.1);
+            -webkit-text-stroke-color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Text Split Animation Utils */
+        .word-wrap {
+            display: inline-block;
+            overflow: hidden;
+            vertical-align: top;
+            padding-top: 0.2em;
+            margin-top: -0.2em;
+            padding-bottom: 0.1em;
+        }
+        .word-inner {
+            display: inline-block;
+            transform: translateY(110%);
+        }
+
+        /* Marquee Animation */
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+        .animate-marquee {
+            animation: marquee 55s linear infinite;
+            will-change: transform;
+        }
+        
+        /* Light Overlay effect */
+        .light-mask {
+            -webkit-mask-image: radial-gradient(400px circle at var(--mouse-x, -9999px) calc(var(--mouse-y, -9999px)), black 10%, transparent 60%);
+            mask-image: radial-gradient(400px circle at var(--mouse-x, -9999px) calc(var(--mouse-y, -9999px)), black 10%, transparent 60%);
+        }
+
+        /* Iframe do Tour Virtual */
+        .custom-iframe {
+            min-height: 500px;
+            height: 100%;
+            width: 100%;
+            border: none;
+        }
+    </style>

@@ -19,65 +19,60 @@
         });
         gsap.ticker.lagSmoothing(0);
 
-        // --- 2. INTRO ANIMATIONS ---
+        // --- 2. INITIAL STATES FOR ALL FOLDS ---
+        gsap.set(".fold3-elem, .fold9-elem, .fold5-elem", { y: 50, opacity: 0 });
+        gsap.set(".fold3-video, #gallery-wrapper, .fold5-tour", { y: 100, opacity: 0, scale: 0.95 });
+
+        // --- 3. INTRO ANIMATIONS ---
         const initIntro = () => {
-            const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
+            const tl = gsap.timeline({ 
+                defaults: { ease: "power4.out" },
+                onComplete: () => {
+                    // Start observing scroll elements only AFTER the intro finishes.
+                    
+                    // --- GALERIA DE PROJETOS (Segunda Dobra) ---
+                    const tlFold9 = gsap.timeline({
+                        scrollTrigger: {
+                            trigger: "#galeria",
+                            start: "top 80%",
+                            toggleActions: "play none none reverse"
+                        }
+                    });
+                    tlFold9.to(".fold9-elem", { y: 0, opacity: 1, duration: 1, ease: "power3.out" })
+                           .to("#gallery-wrapper", { y: 0, opacity: 1, scale: 1, duration: 1.5, ease: "power2.out" }, "-=0.6");
+
+                    // --- TOUR VIRTUAL (Terceira Dobra) ---
+                    const tlFold5 = gsap.timeline({
+                        scrollTrigger: {
+                            trigger: "#tour",
+                            start: "top 80%",
+                            toggleActions: "play none none reverse"
+                        }
+                    });
+                    tlFold5.to(".fold5-elem", { y: 0, opacity: 1, duration: 1, ease: "power3.out" })
+                           .to(".fold5-tour", { y: 0, opacity: 1, scale: 1, duration: 1.5, ease: "power2.out" }, "-=0.6");
+                }
+            });
             
             // Body Fade In
-            tl.to("body", { opacity: 1, duration: 1 });
+            tl.to("body", { opacity: 1, duration: 0.5 });
 
-            // Text Elements Entrance
+            // Nav Elements Entrance
             tl.from(".nav-elem", {
-                y: 60,
+                y: 40,
                 opacity: 0,
-                filter: "blur(12px)",
-                duration: 1.6,
-                stagger: 0.15,
-            }, "-=0.5");
+                filter: "blur(8px)",
+                duration: 1.2,
+                stagger: 0.1,
+            }, "-=0.2");
 
-            // New First Fold Entrance
-            tl.from(".fold3-elem", {
-                y: 50,
-                opacity: 0,
-                duration: 1,
-                stagger: 0.15,
-                ease: "power3.out"
-            }, "-=1.0")
-            .from(".fold3-video", {
-                y: 50,
-                opacity: 0,
-                scale: 0.95,
-                duration: 1.5,
-                ease: "power2.out"
-            }, "-=0.6");
+            // Primeira Dobra (Lançamentos)
+            tl.to(".fold3-elem", { y: 0, opacity: 1, duration: 1, ease: "power3.out" }, "-=0.6")
+              .to(".fold3-video", { y: 0, opacity: 1, scale: 1, duration: 1.5, ease: "power2.out" }, "-=0.6");
         };
 
         // --- 6. QUINTA DOBRA - Tour Virtual ---
-        gsap.set(".fold5-elem", { y: 50, opacity: 0 });
-        gsap.set(".fold5-tour", { y: 100, opacity: 0, scale: 0.95 });
-
-        const tlFold5 = gsap.timeline({
-            scrollTrigger: {
-                trigger: ".fold5-tour",
-                start: "top 85%",
-                toggleActions: "play none none reverse"
-            }
-        });
-        
-        tlFold5.to(".fold5-elem", {
-            y: 0,
-            opacity: 1,
-            duration: 1,
-            stagger: 0.15,
-            ease: "power3.out"
-        })
-        .to(".fold5-tour", {
-            y: 0,
-            opacity: 1,
-            scale: 1,
-            duration: 1.5,
-            ease: "power2.out"
-        }, "-=0.6");
+        // (Animations delegated to the global ScrollTrigger.batch above to ensure perfect load sequence)
 
         // --- 7. SEXTA DOBRA - Valor & Processo ---
         
@@ -102,7 +97,7 @@
                 trigger: ".fold6-trigger",
                 start: "top top",      
                 end: "bottom bottom", 
-                scrub: true
+                scrub: 1
             }
         });
         
@@ -114,7 +109,7 @@
                 trigger: ".fold6-elem",
                 start: "top 100%",      
                 end: "top 50%", 
-                scrub: true
+                scrub: 1
             }
         });
 
@@ -126,7 +121,7 @@
                 trigger: ".fold6-trigger",
                 start: "top center",
                 end: "bottom 80%",
-                scrub: true
+                scrub: 1
             }
         });
 
@@ -167,7 +162,7 @@
                 trigger: ".fold6-cards-wrapper",
                 start: "bottom 60%",
                 end: "bottom top",
-                scrub: true
+                scrub: 1
             }
         });
 
@@ -179,7 +174,7 @@
                 trigger: ".fold6-cards-wrapper",
                 start: "bottom 40%",
                 end: "bottom top",
-                scrub: true
+                scrub: 1
             }
         });
 
@@ -281,6 +276,7 @@
 
         // Auto-play interval: 1.5 seconds (1500ms)
         function startSlideshow() {
+            clearInterval(slideInterval);
             slideInterval = setInterval(nextSlide, 1500);
         }
 
@@ -293,8 +289,12 @@
 
         // Pause on hover
         const gallerySection = document.querySelector('#gallery-slider').parentElement;
-        gallerySection.addEventListener('mouseenter', stopSlideshow);
-        gallerySection.addEventListener('mouseleave', startSlideshow);
+        gallerySection.addEventListener('mouseenter', () => {
+            if (window.matchMedia('(hover: hover)').matches) stopSlideshow();
+        });
+        gallerySection.addEventListener('mouseleave', () => {
+            if (window.matchMedia('(hover: hover)').matches) startSlideshow();
+        });
 
         // Buttons
         document.getElementById('gallery-prev').addEventListener('click', () => {
@@ -304,6 +304,15 @@
         document.getElementById('gallery-next').addEventListener('click', () => {
             stopSlideshow();
             nextSlide();
+        });
+
+        // Mobile: resume autoplay when clicking outside the gallery
+        document.addEventListener('touchstart', (e) => {
+            if (!window.matchMedia('(hover: hover)').matches) {
+                if (!gallerySection.contains(e.target)) {
+                    startSlideshow();
+                }
+            }
         });
 
         // Execute intro

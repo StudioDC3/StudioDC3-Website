@@ -1,4 +1,4 @@
-﻿        /* Base Tokens based on design_system5 */
+        /* Base Tokens based on design_system5 */
         :root {
             --c-bg: #E3E1DC; 
             --c-dark: #121212;
@@ -99,7 +99,6 @@
 
         /* Iframe do Tour Virtual */
         .custom-iframe {
-            min-height: 500px;
             height: 100%;
             width: 100%;
             border: none;

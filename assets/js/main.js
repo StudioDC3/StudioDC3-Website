@@ -27,114 +27,30 @@
             tl.to("body", { opacity: 1, duration: 1 });
 
             // Text Elements Entrance
-            tl.from(".hero-elem, .nav-elem", {
+            tl.from(".nav-elem", {
                 y: 60,
                 opacity: 0,
                 filter: "blur(12px)",
                 duration: 1.6,
                 stagger: 0.15,
             }, "-=0.5");
+
+            // New First Fold Entrance
+            tl.from(".fold3-elem", {
+                y: 50,
+                opacity: 0,
+                duration: 1,
+                stagger: 0.15,
+                ease: "power3.out"
+            }, "-=1.0")
+            .from(".fold3-video", {
+                y: 50,
+                opacity: 0,
+                scale: 0.95,
+                duration: 1.5,
+                ease: "power2.out"
+            }, "-=0.6");
         };
-
-        // --- 3. IMAGE SEQUENCE SCROLL-DRIVEN LOGIC ---
-        const canvas = document.getElementById('hero-canvas');
-        const context = canvas.getContext('2d');
-
-        const frameCount = 20;
-        const currentFrame = index => (
-            `assets/video-frames/Frame${(index + 17).toString().padStart(5, '0')}.png`
-        );
-
-        const images = [];
-        const imageSequence = { frame: 0 };
-
-        // Preload images
-        for (let i = 0; i < frameCount; i++) {
-            const img = new Image();
-            img.src = currentFrame(i);
-            images.push(img);
-        }
-
-        function render() {
-            if (images[imageSequence.frame] && images[imageSequence.frame].complete) {
-                // Ensure canvas resolution matches image resolution dynamically
-                canvas.width = images[imageSequence.frame].naturalWidth || 1920;
-                canvas.height = images[imageSequence.frame].naturalHeight || 1080;
-                
-                context.clearRect(0, 0, canvas.width, canvas.height);
-                context.drawImage(images[imageSequence.frame], 0, 0);
-            }
-        }
-
-        images[0].onload = render;
-
-        // Master Scroll Scrub for Images
-        ScrollTrigger.create({
-            trigger: "#hero-track",
-            start: "top top",
-            end: "bottom bottom",
-            scrub: 1.5,
-            onUpdate: (self) => {
-                const targetFrame = Math.round(self.progress * (frameCount - 1));
-                if (imageSequence.frame !== targetFrame) {
-                    imageSequence.frame = targetFrame;
-                    render();
-                }
-            }
-        });
-
-        // Extra Detail: Parallax/Fade the texts and overlay as we get close to the end of the track
-        gsap.to(".hero-elem", {
-            y: -60,
-            opacity: 0,
-            filter: "blur(6px)",
-            scrollTrigger: {
-                trigger: "#hero-track",
-                start: "60% top",
-                end: "bottom top", 
-                scrub: 2
-            }
-        });
-        
-        // Fade out the dark gradient overlay gently
-        gsap.to(".video-container > div", {
-            opacity: 0,
-            scrollTrigger: {
-                trigger: "#hero-track",
-                start: "60% top",
-                end: "bottom top", 
-                scrub: 2
-            }
-        });
-        
-        // --- 5. TERCEIRA DOBRA - Animações e Youtube API ---
-        
-        // Setup initial states
-        gsap.set(".fold3-elem", { y: 50, opacity: 0 });
-        gsap.set(".fold3-video", { y: 100, opacity: 0, scale: 0.95 });
-
-        const tlFold3 = gsap.timeline({
-            scrollTrigger: {
-                trigger: ".fold3-video",
-                start: "top 85%",
-                toggleActions: "play none none reverse"
-            }
-        });
-        
-        tlFold3.to(".fold3-elem", {
-            y: 0,
-            opacity: 1,
-            duration: 1,
-            stagger: 0.15,
-            ease: "power3.out"
-        })
-        .to(".fold3-video", {
-            y: 0,
-            opacity: 1,
-            scale: 1,
-            duration: 1.5,
-            ease: "power2.out"
-        }, "-=0.6");
 
         // --- 6. QUINTA DOBRA - Tour Virtual ---
         gsap.set(".fold5-elem", { y: 50, opacity: 0 });

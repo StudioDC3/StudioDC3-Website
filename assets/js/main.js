@@ -1,4 +1,4 @@
-        // --- 0. PRE-SET ---
+﻿        // --- 0. PRE-SET ---
         gsap.registerPlugin(ScrollTrigger);
         
         // --- 1. LENIS SMOOTH SCROLL ---
@@ -228,7 +228,7 @@
             }
         }
         // --- Gallery Slider Logic ---
-        const galleryFiles = ['001.png','002.jpg','003.jpg','004.jpg','005.jpg','006.jpg','007.png','008.png','009.png','010.png','011.png','012.png','013.png','014.png','015.png','016.png','017.png','018.png','019.png','020.png','021.jpg','022.jpg'];
+        const galleryFiles = ['001.webp','002.webp','003.webp','004.webp','005.webp','006.webp','007.webp','008.webp','009.webp','010.webp','011.webp','012.webp','013.webp','014.webp','015.webp','016.webp','017.webp','018.webp','019.webp','020.webp','021.webp','022.webp'];
         const sliderContainer = document.getElementById('gallery-slider');
         
         // Populate slider

@@ -1,4 +1,4 @@
-﻿        // --- 0. PRE-SET ---
+        // --- 0. PRE-SET ---
         gsap.registerPlugin(ScrollTrigger);
         
         // --- 1. LENIS SMOOTH SCROLL ---
@@ -230,21 +230,63 @@
         // --- Gallery Slider Logic ---
         const galleryFiles = ['001.webp','002.webp','003.webp','004.webp','005.webp','006.webp','007.webp','008.webp','009.webp','010.webp','011.webp','012.webp','013.webp','014.webp','015.webp','016.webp','017.webp','018.webp','019.webp','020.webp','021.webp','022.webp'];
         const sliderContainer = document.getElementById('gallery-slider');
+        const thumbnailsContainer = document.getElementById('gallery-thumbnails');
+        const counterElement = document.getElementById('gallery-counter');
         
-        // Populate slider
+        // Populate slider and thumbnails
         galleryFiles.forEach((file, index) => {
+            // Main Slide
             const img = document.createElement('img');
             img.src = `assets/images/Oitava Dobra/${file}`;
             img.alt = `Projeto ${index + 1}`;
-            // Base classes: absolute, full size, cover.
-            // Transition: dissolve 1s
             img.className = `absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${index === 0 ? 'opacity-100 z-10' : 'opacity-0 -z-10'}`;
             sliderContainer.appendChild(img);
+
+            // Thumbnail
+            if (thumbnailsContainer) {
+                const thumbWrap = document.createElement('div');
+                thumbWrap.className = `relative w-16 h-12 md:w-28 md:h-16 shrink-0 cursor-pointer overflow-hidden rounded-md transition-all duration-300 snap-center border-[1.5px] ${index === 0 ? 'border-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.4)] opacity-100' : 'border-transparent opacity-40 hover:opacity-100 hover:border-white/20'}`;
+                
+                const thumbImg = document.createElement('img');
+                thumbImg.src = `assets/images/Oitava Dobra/${file}`;
+                thumbImg.className = "w-full h-full object-cover";
+                thumbWrap.appendChild(thumbImg);
+                
+                thumbWrap.onclick = () => {
+                    stopSlideshow();
+                    goToSlide(index);
+                };
+                
+                thumbnailsContainer.appendChild(thumbWrap);
+            }
         });
 
         const slides = sliderContainer.querySelectorAll('img');
+        const thumbs = thumbnailsContainer ? thumbnailsContainer.querySelectorAll('div') : [];
         let currentSlide = 0;
         let slideInterval;
+
+        function updateCounter(index) {
+            if (counterElement) {
+                counterElement.textContent = `${index + 1}/${galleryFiles.length}`;
+            }
+        }
+
+        function updateThumbnails(index) {
+            if (!thumbs.length) return;
+            thumbs.forEach((thumb, i) => {
+                if (i === index) {
+                    thumb.className = `relative w-16 h-12 md:w-28 md:h-16 shrink-0 cursor-pointer overflow-hidden rounded-md transition-all duration-300 snap-center border-[1.5px] border-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.4)] opacity-100`;
+                    // Localized smooth scroll to prevent page jumps
+                    if (thumbnailsContainer) {
+                        const scrollPos = thumb.offsetLeft - (thumbnailsContainer.clientWidth / 2) + (thumb.clientWidth / 2);
+                        thumbnailsContainer.scrollTo({ left: scrollPos, behavior: 'smooth' });
+                    }
+                } else {
+                    thumb.className = `relative w-16 h-12 md:w-28 md:h-16 shrink-0 cursor-pointer overflow-hidden rounded-md transition-all duration-300 snap-center border-[1.5px] border-transparent opacity-40 hover:opacity-100 hover:border-white/20`;
+                }
+            });
+        }
 
         function goToSlide(index) {
             const nextIndex = (index + slides.length) % slides.length;
@@ -264,6 +306,8 @@
             slides[nextIndex].className = 'absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out opacity-100 z-10';
 
             currentSlide = nextIndex;
+            updateCounter(currentSlide);
+            updateThumbnails(currentSlide);
         }
 
         function nextSlide() {
@@ -274,14 +318,18 @@
             goToSlide(currentSlide - 1);
         }
 
+        const pauseText = document.getElementById('gallery-pause-text');
+
         // Auto-play interval: 1.5 seconds (1500ms)
         function startSlideshow() {
             clearInterval(slideInterval);
             slideInterval = setInterval(nextSlide, 1500);
+            if (pauseText) pauseText.classList.add('hidden');
         }
 
         function stopSlideshow() {
             clearInterval(slideInterval);
+            if (pauseText) pauseText.classList.remove('hidden');
         }
 
         // Start initially

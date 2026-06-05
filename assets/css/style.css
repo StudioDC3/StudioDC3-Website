@@ -90,6 +90,13 @@
             animation: marquee 55s linear infinite;
             will-change: transform;
         }
+
+        @media (max-width: 767px) {
+            .mobile-no-marquee {
+                animation: none !important;
+                transform: none !important;
+            }
+        }
         
         /* Light Overlay effect */
         .light-mask {

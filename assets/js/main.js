@@ -212,6 +212,25 @@
         // Native Video Logic
         const nativeVideo = document.getElementById('native-video');
         
+        // Force play logic to bypass strict iOS/Mobile Safari autoplay restrictions
+        if (nativeVideo) {
+            const forcePlay = () => {
+                nativeVideo.muted = true;
+                nativeVideo.playsInline = true;
+                const playPromise = nativeVideo.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        console.log("Autoplay prevented, awaiting interaction:", error);
+                    });
+                }
+            };
+            // Attempt immediately
+            forcePlay();
+            // Force play on first touch/click
+            document.addEventListener('touchstart', forcePlay, { once: true, passive: true });
+            document.addEventListener('click', forcePlay, { once: true, passive: true });
+        }
+
         window.toggleSound = function() {
             const btnText = document.querySelector('.sound-toggle-button .btn-text');
             const icon = document.getElementById('sound-icon');
@@ -354,6 +373,34 @@
             nextSlide();
         });
 
+        // Swipe to navigate (Mobile)
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        gallerySection.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+            stopSlideshow();
+        }, { passive: true });
+
+        gallerySection.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+            // Start again if it was just a quick swipe
+            if (!window.matchMedia('(hover: hover)').matches) {
+                startSlideshow();
+            }
+        }, { passive: true });
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            if (touchEndX < touchStartX - swipeThreshold) {
+                nextSlide();
+            }
+            if (touchEndX > touchStartX + swipeThreshold) {
+                prevSlide();
+            }
+        }
+
         // Mobile: resume autoplay when clicking outside the gallery
         document.addEventListener('touchstart', (e) => {
             if (!window.matchMedia('(hover: hover)').matches) {
@@ -362,6 +409,27 @@
                 }
             }
         });
+
+        // Mobile auto-scroll for Empreendimentos Assinados (Fold 7)
+        const clientsScrollContainer = document.getElementById('clients-scroll-container');
+        if (clientsScrollContainer && window.matchMedia('(max-width: 767px)').matches) {
+            let clientsScrollInterval;
+            let isUserScrolling = false;
+
+            const startClientsAutoScroll = () => {
+                if (isUserScrolling) return;
+                clientsScrollContainer.scrollLeft += 1.5;
+            };
+
+            // Setup interval for auto-scroll
+            clientsScrollInterval = setInterval(startClientsAutoScroll, 25);
+
+            // Disable auto-scroll as soon as user touches it
+            clientsScrollContainer.addEventListener('touchstart', () => {
+                isUserScrolling = true;
+                clearInterval(clientsScrollInterval);
+            }, { passive: true });
+        }
 
         // Execute intro
         initIntro();
